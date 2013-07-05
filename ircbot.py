@@ -325,6 +325,7 @@ class connection:
                 controller(message)
             except:
                 print("Fehler beim einlesen der nachricht")
+
     def send(self, nachricht):
         global startzeit
         global endzeit
