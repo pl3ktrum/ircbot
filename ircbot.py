@@ -292,7 +292,7 @@ def controller(message):
                 if bot_befehl.startswith("say0815"):
                     bot_say(nachricht)
                 if bot_befehl.startswith("wer ist"):
-                    adjektiv = bot_befehl.split(" ")[2]
+                    adjektiv = bot_befehl.split(" ", 2)[2]
                     bot_adjektiv(nick, privat, adjektiv)
                 if bot_befehl == "uptime":
                     system_uptime(nick, privat)
