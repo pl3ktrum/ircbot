@@ -10,8 +10,8 @@ from datetime import timedelta
 IRCHOST = 'xs4all.nl.quakenet.org'  
 IRCPORT =  6667
 IRCUSER = 'BierBot * * : bestaboteva'
-IRCNICK = 'BierBotss'
-IRCchannel = '#dasimperiumss'
+IRCNICK = 'BierBot'
+IRCchannel = '#dasimperium'
 ######################################
 
 # Liste der im Channel anwesenden leute
@@ -196,7 +196,7 @@ def bot_adjektiv(nick, privat, adjektiv):
     rseed = random.random()
     random.seed(rseed)
     if privat == True:
-        con.send("PRIVMSG {} :{} ist {}
+        con.send("PRIVMSG {} :{} ist {}".format(nick, user_online[random.randint(0, len(user_online) -1)], adjektiv))
     
 def pingpong(message):
 # Antwortet auf den Ping
