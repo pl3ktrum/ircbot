@@ -196,8 +196,10 @@ def bot_adjektiv(nick, privat, adjektiv):
     if adjektiv == "cool":
         if privat == True:
             con.send("PRIVMSG {} :Du nicht!".format(nick))
+            return
         else:
             con.send("PRIVMSG {} :Du nicht!".format(IRCchannel))
+            return
     rseed = random.random()
     random.seed(rseed)
     if privat == True:
@@ -318,12 +320,11 @@ class connection:
         while True:
             # sendet die empfangenen daten an die controller methode
             # ohne escape sequenz
-            #try:
-            message = self.fs.readline()[:-1]
-            controller(message)
-            print(message)
-            #except:
-            #    print("Fehler beim einlesen der nachricht")
+            try:
+                message = self.fs.readline()[:-1]
+                controller(message)
+            except:
+                print("Fehler beim einlesen der nachricht")
     def send(self, nachricht):
         global startzeit
         global endzeit
