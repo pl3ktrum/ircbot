@@ -184,15 +184,15 @@ def nick_changed(nick_alt, nick_neu):
 def konsolen_ausgabe(nachricht):
     zeit = timestamp()
     print("\n" + zeit + nachricht + "\n\n")
-    
-def bot_schwul():
-    global user_online
-    rseed = random.random()
-    random.seed(rseed)
-    con.send("PRIVMSG {} :{} ist schwul".format(IRCchannel, user_online[random.randint(0, len(user_online) -1)]))
 
 def bot_adjektiv(nick, privat, adjektiv):
     global user_online
+    if adjektiv.find(".") != -1:
+        adjektiv = adjektiv.replace(".","")
+    if adjektiv.find("!") != -1:
+        adjektiv = adjektiv.replace("!","")
+    if adjektiv.find("?") != -1:
+        adjektiv = adjektiv.replace("?","")
     if adjektiv == "cool":
         if privat == True:
             con.send("PRIVMSG {} :Du nicht!".format(nick))
