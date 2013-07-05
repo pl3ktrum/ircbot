@@ -193,11 +193,18 @@ def bot_schwul():
 
 def bot_adjektiv(nick, privat, adjektiv):
     global user_online
+    if adjektiv == "cool":
+        if privat == True:
+            con.send("PRIVMSG {} :Du nicht!".format(nick))
+        else:
+            con.send("PRIVMSG {} :Du nicht!".format(IRCchannel))
     rseed = random.random()
     random.seed(rseed)
     if privat == True:
         con.send("PRIVMSG {} :{} ist {}".format(nick, user_online[random.randint(0, len(user_online) -1)], adjektiv))
-    
+    else:
+        con.send("PRIVMSG {} :{} ist {}".format(IRCchannel, user_online[random.randint(0, len(user_online) -1)], adjektiv))
+        
 def pingpong(message):
 # Antwortet auf den Ping
     pong = message.split(":")
@@ -282,10 +289,9 @@ def controller(message):
                     bot_kaffee(nick, privat)
                 if bot_befehl.startswith("say0815"):
                     bot_say(nachricht)
-                if bot_befehl.startswith("wer ist schwul"):
-                    bot_schwul()
-                if bot_befehl.startswith("wer ist schwul"):
-                    bot_scheisse()
+                if bot_befehl.startswith("wer ist"):
+                    adjektiv = bot_befehl.split(" ")[2]
+                    bot_adjektiv(nick, privat, adjektiv)
                 if bot_befehl == "uptime":
                     system_uptime(nick, privat)
 class connection:
