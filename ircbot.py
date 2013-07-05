@@ -19,27 +19,6 @@ user_online = []
 # Liste in der die Witze gespeichert werden
 witze = []
 
-#(de)encoding zeugs
-def _decode(bytes):
-    try:
-        text = bytes.decode("utf-8")
-    except UnicodeDecodeError:
-        try:
-            text = bytes.decode("iso-8859-1")
-        except UnicodeDecodeError:
-            text = bytes.decode("cp1252")
-    return text
-
-def _encode(bytes):
-    try:
-        text = bytes.encode('utf-8')
-    except UnicodeEncodeError:
-        try:
-            text = bytes.encode('iso-8859-1')
-        except UnicodeEncodeError:
-            text = bytes.encode('cp1252')
-    return text
-
 def timestamp(ausgabe = ""):
     zeit = time.localtime()
     if ausgabe == "":
@@ -87,15 +66,6 @@ def gibwitz():
     else:
         return "keine Witze geladen"
     
-def leet_party():
-    con.send("PRIVMSG {} :1337 PARTY!!!!!!!".format(IRCchannel))
-    
-def aufmuntern(nick):
-    con.send("PRIVMSG {} :Nicht traurig sein {}".format(IRCchannel, nick))
-    
-def anti_age(nick):
-    con.send("PRIVMSG {} :Schrei nicht so rum {}!".format(IRCchannel, nick))
-    
 def bot_commands(nick):
     befehle = (
         "commands - Listet alle Befehle auf",
@@ -113,9 +83,9 @@ def bot_commands(nick):
         con.send("PRIVMSG {} :{}".format(nick, element))
         time.sleep(0.2)
         
-def bot_say(nachricht):
-    nachricht = nachricht.split("say0815", 1)[1]
-    con.send("PRIVMSG {} :{}".format(IRCchannel, nachricht))
+##def bot_say(nachricht):
+##    nachricht = nachricht.split("say", 1)[1]
+##    con.send("PRIVMSG {} :{}".format(IRCchannel, nachricht))
     
 def bot_weed(nick, privat = False):
     if privat == False:
@@ -171,7 +141,6 @@ def bot_willkommen(nick):
         
 def bot_wiedersehen(nick):
     global user_online
-    con.send("PRIVMSG {} :Tschüss {}!".format(IRCchannel, nick))
     botmysql.userstats(nick, "leaved_channel")
     user_online.remove(nick)
     
