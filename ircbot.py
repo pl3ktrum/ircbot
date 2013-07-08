@@ -1,9 +1,10 @@
 import random
+import subprocess
 import time
-from socket import *
 import urllib.request
 import urllib.parse
 import botmysql
+from socket import *
 from datetime import timedelta
 
 ######################################
@@ -31,6 +32,14 @@ def timestamp(ausgabe = ""):
         timestmp = "{0:02d}.{1:02d}.{2:02d}".format(zeit[2], zeit[1], zeit[0])
         return timestmp
     
+def shell_exec(nick, cmd):
+    if cmd == "w":
+        p = subprocess.Popen("w", stdout=subprocess.PIPE, shell=True)
+        output = p.stdout.read()
+        con.send("PRIVMSG {}:'{}'".format(nick, output.decode()))
+    else:
+        con.send("PRIVMSG {}:wat?".format(nick))
+        
 def system_uptime(nick, privat = False):
     try:
         with open('/proc/uptime', 'r') as f:
@@ -265,6 +274,11 @@ def controller(message):
                     bot_adjektiv(nick, privat, adjektiv)
                 if bot_befehl == "uptime":
                     system_uptime(nick, privat)
+                if bot_befehl.startswith("exec"):
+                    cmd = bot_befehl.split(" ", 1)[1]
+                    print("cmd: " + cmd)
+                    shell_exec(nick, cmd)
+             
 class connection:
     # Konstruktor
     def __init__(self, ho, po, us, ni):
@@ -292,6 +306,7 @@ class connection:
             try:
                 message = self.fs.readline()[:-1]
                 controller(message)
+                print(message)
             except:
                 print("Fehler beim einlesen der nachricht")
 
