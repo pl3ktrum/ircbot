@@ -33,12 +33,16 @@ def timestamp(ausgabe = ""):
         return timestmp
     
 def shell_exec(nick, cmd):
-    if cmd == "w":
-        p = subprocess.Popen("w", stdout=subprocess.PIPE, shell=True)
-        output = p.stdout.read()
-        con.send("PRIVMSG {}:'{}'".format(nick, output.decode()))
+    if cmd == "ls":
+        p = subprocess.Popen("ls", stdout=subprocess.PIPE, shell=True)
+        output = p.stdout.read().decode().replace("\r", "").replace("\n", "")
+        con.send("PRIVMSG {} : {}".format(nick, output))
+    if cmd == "df":
+        p = subprocess.Popen("df -h", stdout=subprocess.PIPE, shell=True)
+        output = p.stdout.read().decode().replace("\r", "").replace("\n", "")
+        con.send("PRIVMSG {} : {}".format(nick, output)) 
     else:
-        con.send("PRIVMSG {}:wat?".format(nick))
+        con.send("PRIVMSG {} : wat?".format(nick))
         
 def system_uptime(nick, privat = False):
     try:
