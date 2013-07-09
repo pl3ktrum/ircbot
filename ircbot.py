@@ -287,6 +287,8 @@ def controller(message):
                 if bot_befehl.startswith("exec"):
                     cmd = bot_befehl.split(" ", 1)[1]
                     shell_exec(nick, cmd)
+                if bot_befehl.startswith("stats"):
+                    return_stats(bot_befehl.split(" ", 1)[1])
              
 class connection:
     # Konstruktor
@@ -383,6 +385,15 @@ def userstats(nick, action, value=""):
             cur.execute("UPDATE userstats SET nick='{}' where nick='{}'".format(value, nick))
             logging.info("{} HEISST JETZT {}".format(nick, value))
     conn.close()  
+## SQL Statistik ##
+
+def return_stats(nick, privat=False, value=""):
+    conn = mysql.connector.connect(user=sqluser, password=sqlpw, host=sqlhost, database=sqldb)
+    cur = conn.cursor()
+    cur.execute("SELECT * from userstats WHERE nick = '{}'".format(nick))
+    id, nick, online, bier, energy, gejoined, zeichen_gesendet = cur.fetchone()
+    con.send("PRIVMSG #dasimperium : {} hat schon {} Bier getrunken, {} Energy, ist schon {} mal gejoined und hat schon {}, zeichen gesendet".format(nick, bier, energy, gejoined, zeichen_gesendet))
+    conn.close()
     
 if __name__ == "__main__":
     con = connection(IRCHOST, IRCPORT, IRCUSER, IRCNICK)
