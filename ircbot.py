@@ -1,9 +1,9 @@
 import random
+import mysql.connector
 import mysqllogin
 import subprocess
 import logging
 import time
-import botmysql
 from socket import *
 from datetime import timedelta
 
