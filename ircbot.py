@@ -61,7 +61,7 @@ def system_uptime(nick, privat = False):
         else:
             con.send("PRIVMSG {} :Uptime: {}".format(IRCchannel, uptime_string))
     except BaseException as e:
-        logging.error("FEHLER '{}'".format(e))
+        logging.exception("FEHLER '{}'".format(e))
 
 def witzeupdate(nick):
     global witze
@@ -69,7 +69,7 @@ def witzeupdate(nick):
     try:
         f = open("witze.txt", "r")
     except BaseExcpetion as e:
-        logging.error("witzedatei konnte nicht geladen werden '{}'".format(e))
+        logging.exception("witzedatei konnte nicht geladen werden '{}'".format(e))
     witze = f.readlines()
     logging.info("Es wurden {} Witze eingelesen".format(len(witze)))
     f.close()
@@ -318,7 +318,7 @@ class connection:
                 message = self.fs.readline()[:-1]
                 controller(message)
             except BaseException as e:
-                logging.error("Fehler beim einlesen der nachricht '{}'".format(e))
+                logging.exception("Fehler beim einlesen der nachricht '{}'".format(e))
 
     def send(self, nachricht):
         global startzeit
@@ -328,7 +328,7 @@ class connection:
             self.fs.flush()
             chatlog("BOT", nachricht)
         except BaseException as e:
-            logging.error("Fehler beim senden der Nachricht '{}'".format(e))
+            logging.exception("Fehler beim senden der Nachricht '{}'".format(e))
 
 
 ## SQL LOGGING ##
@@ -351,9 +351,9 @@ def chatlog(nick, nachricht):
         cur = conn.cursor()
         # Query ausführen
         cur.execute("INSERT INTO irclog (nick, nachricht) VALUES ('{}', '{}')".format(nick, nachricht))
-    if userExists(nick):
-        cur.execute("UPDATE userstats SET zeichen_gesendet=zeichen_gesendet+{} where nick='{}'".format(len(nachricht), nick))
-    conn.close()
+        if userExists(nick):
+            cur.execute("UPDATE userstats SET zeichen_gesendet=zeichen_gesendet+{} where nick='{}'".format(len(nachricht), nick))
+        conn.close()
       
 def userstats(nick, action, value=""):
 # Verbindungm mit der Datenbank herstellen
@@ -392,7 +392,7 @@ def return_stats(nick, privat=False, value=""):
     cur = conn.cursor()
     cur.execute("SELECT * from userstats WHERE nick = '{}'".format(nick))
     id, nick, online, bier, energy, gejoined, zeichen_gesendet = cur.fetchone()
-    con.send("PRIVMSG #dasimperium : {} hat schon {} Bier getrunken, {} Energy, ist schon {} mal gejoined und hat schon {}, zeichen gesendet".format(nick, bier, energy, gejoined, zeichen_gesendet))
+    con.send("PRIVMSG {} : {} hat schon {} Bier getrunken, {} Energy, ist schon {} mal gejoined und hat schon {}, zeichen gesendet".format(IRCchannel, nick, bier, energy, gejoined, zeichen_gesendet))
     conn.close()
     
 if __name__ == "__main__":
