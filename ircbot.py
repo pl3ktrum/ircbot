@@ -13,6 +13,10 @@ IRCPORT =  6667
 IRCUSER = 'BierBot * * : bestaboteva'
 IRCNICK = 'BierBot'
 IRCchannel = '#dasimperium'
+sqlhost = mysqllogin.sqlhost
+sqluser = mysqllogin.sqluser
+sqlpw = mysqllogin.sqlpw
+sqldb = mysqllogin.sqldb
 ######################################
 
 # Liste der im Channel anwesenden leute
@@ -21,7 +25,7 @@ user_online = []
 witze = []
 
 # konfiguation des loggers
-logging.baseconfig(filename='bot.log', level=logging.DEBUG, format="%(asctime)s %(message)s")
+logging.basicConfig(filename='bot.log', level=logging.DEBUG, format="%(asctime)s %(message)s")
 
 def timestamp(ausgabe = ""):
     zeit = time.localtime()
@@ -57,7 +61,7 @@ def system_uptime(nick, privat = False):
         else:
             con.send("PRIVMSG {} :Uptime: {}".format(IRCchannel, uptime_string))
     except BaseException as e:
-        logging.exception("FEHLER '{}'".format(e))
+        logging.error("FEHLER '{}'".format(e))
 
 def witzeupdate(nick):
     global witze
@@ -65,7 +69,7 @@ def witzeupdate(nick):
     try:
         f = open("witze.txt", "r")
     except BaseExcpetion as e:
-        logging.exception("witzedatei konnte nicht geladen werden '{}'".format(e))
+        logging.error("witzedatei konnte nicht geladen werden '{}'".format(e))
     witze = f.readlines()
     logging.info("Es wurden {} Witze eingelesen".format(len(witze)))
     f.close()
@@ -132,39 +136,39 @@ def bot_bier(nick, privat):
         con.send("PRIVMSG {} :Öffnet ein Bier für {} und reicht es feierlich rüber".format(IRCchannel, nick))
     else:
         con.send("PRIVMSG {} :Öffnet dir ein Bier und reicht es feierlich rüber".format(nick))
-    botmysql.userstats(nick, "bier_erhalten")
+    userstats(nick, "bier_erhalten")
     
 def bot_kaffee(nick, privat):
     if privat == False:
         con.send("PRIVMSG {} :Reicht {} einen leckeren Kaffee rüber".format(IRCchannel, nick))
     else:
         con.send("PRIVMSG {} :Reicht dir einen mega leckeren Kaffee rüber".format(nick))
-    botmysql.userstats(nick, "energy_erhalten")  
+    userstats(nick, "energy_erhalten")  
 
 def bot_monster(nick, privat):
     if privat == False:
         con.send("PRIVMSG {} :Reicht {} ein mega kaltes Monster Energy rüber".format(IRCchannel, nick))
     else:
         con.send("PRIVMSG {} :Reicht dir ein mega kaltes Monster Energy rüber".format(nick))
-    botmysql.userstats(nick, "energy_erhalten")
+    userstats(nick, "energy_erhalten")
     
 def bot_willkommen(nick):
     global user_online
     if nick != IRCNICK:
         con.send("PRIVMSG {} :Hallo {}!".format(IRCchannel, nick))
-        botmysql.userstats(nick, "joined_channel")
+        userstats(nick, "joined_channel")
         user_online.append(nick)
         
 def bot_wiedersehen(nick):
     global user_online
-    botmysql.userstats(nick, "leaved_channel")
+    userstats(nick, "leaved_channel")
     user_online.remove(nick)
     
 def nick_changed(nick_alt, nick_neu):
     global user_online
     user_online.remove(nick_alt)
     user_online.append(nick_neu)
-    botmysql.userstats(nick_alt, "nick_changed", nick_neu)
+    userstats(nick_alt, "nick_changed", nick_neu)
 
 def konsolen_ausgabe(nachricht):
     zeit = timestamp()
@@ -242,7 +246,7 @@ def controller(message):
         #Extrahiert die Nachricht aus der servermessage
         nachricht = message.split(" ", 3)[3][1:]
         #Schickt die nachricht an die Verlaufmethode
-        botmysql.chatlog(nick, nachricht)
+        chatlog(nick, nachricht)
         #Überprüft ob der Bot angesprochen wurde
         if nachricht.lower().find(IRCNICK.lower()) != -1 and message.split(" ")[1].startswith("PRIVMSG"):
             if nachricht.lower().startswith(IRCNICK.lower()):
@@ -312,7 +316,7 @@ class connection:
                 message = self.fs.readline()[:-1]
                 controller(message)
             except BaseException as e:
-                logging.exception("Fehler beim einlesen der nachricht '{}'".format(e))
+                logging.error("Fehler beim einlesen der nachricht '{}'".format(e))
 
     def send(self, nachricht):
         global startzeit
@@ -320,43 +324,38 @@ class connection:
         try:
             self.fs.write(nachricht + "\n")
             self.fs.flush()
-            botmysql.chatlog("BOT", nachricht)
+            chatlog("BOT", nachricht)
         except BaseException as e:
-            logging.exception("Fehler beim senden der Nachricht '{}'".format(e))
+            logging.error("Fehler beim senden der Nachricht '{}'".format(e))
 
-class botmysql:
-    def __init__(self):
-        self.sqlhost = mysqllogin.sqlhost
-        self.sqluser = mysqllogin.sqluser
-        self.sqlpw = mysqllogin.sqlpw
-        self.sqldb = mysqllogin.sqldb
 
-    def userExists(self, nick):
-        #Prüft ob der Nutzer angelegt ist, und legt dieses gegebenenfalls an
-        conn = mysql.connector.connect(user=self.sqluser, password=self.sqlpw, host=self.sqlhost, database=self.sqldb, buffered=True)
-        cur = conn.cursor()
-        cur.execute("SELECT nick FROM userstats WHERE nick = '{}'".format(nick))
-        if cur.rowcount < 1:
-            cur.execute("INSERT INTO userstats (nick) VALUES '{}'".format(nick))
-            return True
-        else:
-            return True
-   conn.close()
+## SQL LOGGING ##
+def userExists(nick):
+    #Prüft ob der Nutzer angelegt ist, und legt dieses gegebenenfalls an
+    conn = mysql.connector.connect(user=sqluser, password=sqlpw, host=sqlhost, database=sqldb, buffered=True)
+    cur = conn.cursor()
+    cur.execute("SELECT nick FROM userstats WHERE nick = '{}'".format(nick))
+    if cur.rowcount < 1:
+        cur.execute("INSERT INTO userstats (nick) VALUES '{}'".format(nick))
+        return True
+    else:
+        return True
+    conn.close()
    
-    def chatlog(self, nick, nachricht):
-        if not nachricht.startswith("PONG :xs4all.nl.quakenet.org"):
+def chatlog(nick, nachricht):
+    if not nachricht.startswith("PONG :xs4all.nl.quakenet.org"):
         # Verbindungm mit der Datenbank herstellen
-        conn = mysql.connector.connect(user=self.sqluser, password=self.sqlpw, host=self.sqlhost, database=self.sqldb, buffered=True)
+        conn = mysql.connector.connect(user=sqluser, password=sqlpw, host=sqlhost, database=sqldb, buffered=True)
         cur = conn.cursor()
         # Query ausführen
         cur.execute("INSERT INTO irclog (nick, nachricht) VALUES ('{}', '{}')".format(nick, nachricht))
-        if userExists(nick):
-            cur.execute("UPDATE userstats SET zeichen_gesendet=zeichen_gesendet+{} where nick='{}'".format(len(nachricht), nick))
-        conn.close()
+    if userExists(nick):
+        cur.execute("UPDATE userstats SET zeichen_gesendet=zeichen_gesendet+{} where nick='{}'".format(len(nachricht), nick))
+    conn.close()
       
-    def userstats(self, nick, action, value=""):
-    # Verbindungm mit der Datenbank herstellen
-    conn = mysql.connector.connect(user=self.sqluser, password=self.sqlpw, host=self.sqlhost, database=self.sqldb, buffered=True)
+def userstats(nick, action, value=""):
+# Verbindungm mit der Datenbank herstellen
+    conn = mysql.connector.connect(user=sqluser, password=sqlpw, host=sqlhost, database=sqldb, buffered=True)
     cur = conn.cursor()
     if action == "joined_channel":
         if userExists(nick):
