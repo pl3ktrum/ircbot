@@ -188,7 +188,7 @@ $RECYCLE.BIN/
 #############
 
 *.py[co]
-botmysql.py
+mysqllogin.py
 # Packages
 *.egg
 *.egg-info
