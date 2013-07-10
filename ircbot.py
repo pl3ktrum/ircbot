@@ -74,7 +74,7 @@ def witzeupdate(nick):
     logging.info("Es wurden {} Witze eingelesen".format(len(witze)))
     f.close()
     endzeit = time.time()
-    con.send("PRIVMSG {} :Es wurden {} witze in {} geladen".format(nick, len(witze), round(endzeit - startzeit, 4)))
+    con.send("PRIVMSG {} :Es wurden {} witze in {}s geladen".format(nick, len(witze), round(endzeit - startzeit, 4)))
     
 def gibwitz():
     global witze
@@ -192,9 +192,9 @@ def bot_adjektiv(nick, privat, adjektiv):
     rseed = random.random()
     random.seed(rseed)
     if privat == True:
-        con.send("PRIVMSG {} :{} ist {}".format(nick, user_online[random.randint(0, len(user_online) -1)], adjektiv))
+        con.send("PRIVMSG {} :{} {}".format(nick, user_online[random.randint(0, len(user_online) -1)], adjektiv))
     else:
-        con.send("PRIVMSG {} :{} ist {}".format(IRCchannel, user_online[random.randint(0, len(user_online) -1)], adjektiv))
+        con.send("PRIVMSG {} :{} {}".format(IRCchannel, user_online[random.randint(0, len(user_online) -1)], adjektiv))
         
 def pingpong(message):
 # Antwortet auf den Ping
@@ -279,8 +279,8 @@ def controller(message):
                     bot_kaffee(nick, privat)
                 if bot_befehl.startswith("say0815"):
                     bot_say(nachricht)
-                if bot_befehl.startswith("wer ist"):
-                    adjektiv = bot_befehl.split(" ", 2)[2]
+                if bot_befehl.startswith("wer"):
+                    adjektiv = bot_befehl.split(" ", 1)[1]
                     bot_adjektiv(nick, privat, adjektiv)
                 if bot_befehl == "uptime":
                     system_uptime(nick, privat)
