@@ -392,7 +392,7 @@ def return_stats(nick, privat=False, value=""):
     cur = conn.cursor()
     cur.execute("SELECT * from userstats WHERE nick = '{}'".format(nick))
     id, nick, online, bier, energy, gejoined, zeichen_gesendet = cur.fetchone()
-    con.send("PRIVMSG {} : {} hat schon {} Bier getrunken, {} Energy, ist schon {} mal gejoined und hat schon {}, zeichen gesendet".format(IRCchannel, nick, bier, energy, gejoined, zeichen_gesendet))
+    con.send("PRIVMSG {} : {} hat schon {} Bier getrunken, {} Energy, ist schon {} mal gejoined und hat schon {} zeichen gesendet".format(IRCchannel, nick, bier, energy, gejoined, zeichen_gesendet))
     conn.close()
     
 if __name__ == "__main__":
