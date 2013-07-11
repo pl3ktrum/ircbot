@@ -44,7 +44,7 @@ def shell_exec(nick, cmd):
         p = subprocess.Popen("ls", stdout=subprocess.PIPE, shell=True)
         output = p.stdout.read().decode().replace("\r", " ").replace("\n", " ")
         con.send("PRIVMSG {} : {}".format(nick, output))
-    if cmd == "df":
+    elif cmd == "df":
         p = subprocess.Popen("df -h", stdout=subprocess.PIPE, shell=True)
         output = p.stdout.read().decode().replace("\r", " ").replace("\n", " ")
         con.send("PRIVMSG {} : {}".format(nick, output)) 
