@@ -68,11 +68,11 @@ def witzeupdate(nick):
     startzeit = time.time()
     try:
         f = open("witze.txt", "r")
+        witze = f.readlines()
+        f.close()
     except BaseExcpetion as e:
-        logging.exception("witzedatei konnte nicht geladen werden '{}'".format(e))
-    witze = f.readlines()
+        logging.error("witzedatei konnte nicht geladen werden '{}'".format(e))
     logging.info("Es wurden {} Witze eingelesen".format(len(witze)))
-    f.close()
     endzeit = time.time()
     con.send("PRIVMSG {} :Es wurden {} witze in {}s geladen".format(nick, len(witze), round(endzeit - startzeit, 4)))
     
@@ -329,7 +329,6 @@ class connection:
             chatlog("BOT", nachricht)
         except BaseException as e:
             logging.exception("Fehler beim senden der Nachricht '{}'".format(e))
-
 
 ## SQL LOGGING ##
 def userExists(nick):
